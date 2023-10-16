@@ -11,7 +11,6 @@ bcrypt = Bcrypt()
 
 @app.route('/auth/register', methods=['POST'])
 def register_user():
-    print("REGISTER REUQEST")
     data = request.json
     # Check if the username already exists
     existing_user = User.query.filter_by(username=data['username']).first()
@@ -19,7 +18,7 @@ def register_user():
         return jsonify({'error': 'Username already exists'}), 400
 
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    new_user = User(username=data['username'], password=hashed_password)
+    new_user = User(username=data['username'], email=data['email'],password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User registered successfully'}), 201
