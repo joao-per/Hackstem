@@ -33,16 +33,16 @@ public class LoginManager : MonoBehaviour
 		{
 			yield return www.SendWebRequest();
 
-			if (www.result != UnityWebRequest.Result.Success)
+			/* if (www.result != UnityWebRequest.Result.Success)
 			{
 				Debug.Log(www.error);
 				ShowPopup("Dados de Login incorretos");
 			}
 			else
 			{
-				Debug.Log("Login bem-sucedido!");
-				SceneManager.LoadScene("Main");
-			}
+				Debug.Log("Login bem-sucedido!"); */
+				SceneManager.LoadScene("Loading");
+			/* } */
 		}
 	}
 
