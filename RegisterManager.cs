@@ -13,7 +13,7 @@ public class RegisterManager : MonoBehaviour
 	public GameObject popup;
 	public TMP_Text popupText;
 
-	private string apiUrl = "http://yourApiUrlHere.com/user";
+	private string apiUrl = "http://127.0.0.1:5000/teste";
 
 	public void Register()
 	{
