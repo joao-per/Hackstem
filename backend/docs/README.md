@@ -1,3 +1,13 @@
-install python3
-pip install Flask
-python app.py
+- install python3
+- pip install Flask
+- pip install python-dotenv
+- pip install Flask-SQLAlchemy
+- pip install Flask-Migrate
+- pip install Flask-Bcrypt
+- pip install Flask-Testing
+- python app.py
+
+- After changing db scheme:
+- flask db init
+- flask db migrate -m "Initial migration"
+- flask db upgrade
