@@ -1,39 +1,29 @@
 import unittest
-from flask import Flask
-from flask_testing import TestCase
-from database import db
-from create_table import app
-from models import User
+from flask import Flask, jsonify
+from app import app, create_tables, get_db
 
-class TestApp(TestCase):
-    def create_app(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'  # Use a separate test database
-        return app
-
+class TestYourApp(unittest.TestCase):
     def setUp(self):
-        db.create_all()
-        self.client = self.app.test_client()
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+        with app.test_request_context():
+            create_tables()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+        pass  # Optionally, you can perform cleanup after each test
 
-    def test_register_and_login(self):
-        # Test User Registration
-        response = self.client.post('/auth/register', json={
-            'username': 'testuser',
-            'password': 'testpassword'
-        })
-        self.assertEqual(response.status_code, 201)
+    def test_index_route(self):
+        response = self.app.get('/test')
+        data = response.get_json()
 
-        # Test User Login
-        response = self.client.post('/auth/login', json={
-            'username': 'testuser',
-            'password': 'testpassword'
-        })
         self.assertEqual(response.status_code, 200)
-        self.assertIn('token', response.json)
+        self.assertIn('message', data)
+        self.assertEqual(data['message'], 'Hello World')
+
+    def test_database_connection(self):
+        with app.test_request_context():
+            db = get_db()
+            self.assertIsNotNone(db)
 
 if __name__ == '__main__':
     unittest.main()

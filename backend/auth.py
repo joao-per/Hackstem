@@ -1,56 +1,67 @@
-from flask import jsonify, request
-
-from database import db
-from create_table import app
-from models import User, UserToken
+from flask import jsonify, request, current_app, Blueprint
 from flask_bcrypt import Bcrypt
+import sqlite3
 
+auth_bp = Blueprint('auth', __name__)
 bcrypt = Bcrypt()
 
-# Endpoints for Authentication
+def create_user(username, email, password):
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-@app.route('/auth/register', methods=['POST'])
-def register_user():
+    with current_app.app_context():
+        conn = sqlite3.connect(current_app.config['DATABASE'])
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            INSERT INTO user (username, email, password)
+            VALUES (?, ?, ?)
+        ''', (username, email, hashed_password))
+
+        conn.commit()
+        conn.close()
+
+def login_user(username, password):
+    with current_app.app_context():
+        conn = sqlite3.connect(current_app.config['DATABASE'])
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT * FROM user
+            WHERE username = ?
+        ''', (username,))
+
+        user = cursor.fetchone()
+
+        if user and bcrypt.check_password_hash(user[3], password):
+            conn.close()
+            return {'message': 'Login successful'}
+        else:
+            conn.close()
+            return {'error': 'Invalid credentials'}, 401
+
+# Example route to use these functions in your Flask app
+@auth_bp.route('/register', methods=['POST'])
+def register():
     data = request.json
-    # Check if the username already exists
-    existing_user = User.query.filter_by(username=data['username']).first()
-    if existing_user:
-        return jsonify({'error': 'Username already exists'}), 400
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
 
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    new_user = User(username=data['username'], email=data['email'],password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
+    if not username or not email or not password:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    create_user(username, email, password)
     return jsonify({'message': 'User registered successfully'}), 201
 
-@app.route('/auth/login', methods=['POST'])
-def login_user():
-    data = request.json
-    user = User.query.filter_by(username=data['username']).first()
-    if user and bcrypt.check_password_hash(user.password, data['password']):
-        # Create a JWT token and store it in the database
-        token = bcrypt.generate_password_hash(data['username']).decode('utf-8')
-        new_user_token = UserToken(user_id=user.id, token=token)
-        db.session.add(new_user_token)
-        db.session.commit()
-        return jsonify({'token': token}), 200
-    else:
-        return jsonify({'error': 'Invalid username or password'}), 401
+@auth_bp.route('/login', methods=['POST'])
+def login():
+	data = request.json
+	username = data.get('username')
+	password = data.get('password')
 
-@app.route('/auth/validate-token', methods=['POST'])
-def validate_token():
-    data = request.json
-    user_token = UserToken.query.filter_by(token=data['token']).first()
-    if user_token:
-        return jsonify({'message': 'Token is valid'}), 200
-    else:
-        return jsonify({'error': 'Invalid token'}), 401
+	print(username, password)
+	if not username or not password:
+		return jsonify({'error': 'Missing required fields'}), 400
 
-@app.route('/test_db')
-def test_db():
-    try:
-        # Try to query the database
-        users = User.query.all()
-        return 'Database connectivity test successful!'
-    except Exception as e:
-        return f'Database connectivity test failed: {str(e)}'
+	result = login_user(username, password)
+	return jsonify(result)
