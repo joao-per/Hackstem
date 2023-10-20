@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, g, current_app
-from dotenv import load_dotenv
 import sqlite3
 from flask_bcrypt import Bcrypt
 from models import userTable, userTokenTable
 from auth import auth_bp
 import os
 
-load_dotenv()
 
 app = Flask(__name__)
 DATABASE = './app.db'
