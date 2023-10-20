@@ -32,13 +32,13 @@ def login_user(username, password):
 
 		user = cursor.fetchone()
 
+
 		if user and bcrypt.check_password_hash(user[3], password):
 			conn.close()
 			return {'message': 'Login successful'}
 		else:
 			conn.close()
-			print('Invalid credentials')
-			return {'error': 'Invalid credentials'}
+			return {'error': 'Invalid credentials'}, 401
 
 # Example route to use these functions in your Flask app
 @auth_bp.route('/register', methods=['POST'])
@@ -64,5 +64,4 @@ def login():
 	if not username or not password:
 		return jsonify({'error': 'Missing required fields'})
 
-	result = login_user(username, password)
-	return jsonify(result)
+	return login_user(username, password) 
