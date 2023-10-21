@@ -3,7 +3,10 @@ userTable = '''
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 email TEXT NOT NULL,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                role_id INTEGER,
+                avatar_id INTEGER,
+                FOREIGN KEY (avatar_id) REFERENCES avatar (id)
             )
         '''
 
@@ -47,3 +50,4 @@ pantsTable = '''
                 name TEXT NOT NULL
             )
         '''
+

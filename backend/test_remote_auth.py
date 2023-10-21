@@ -20,21 +20,21 @@ class TestRemoteAuthenticationEndpoints(unittest.TestCase):
 
 	def test_register_user(self):
 		data = {
-			'username': 'testuser',
-			'email': 'testuser@example.com',
-			'password': 'password123'
+			'username': "testRegisterUser",
+			'email': "ppppppppppppppppp@example.com",
+			'password': "password123"
 		}
 
 		response = requests.post(f"{self.base_url}/register", json=data)
 		data = response.get_json()
-
+		print(data)
 		self.assertEqual(response.status_code, 201)
 		self.assertIn('message', data)
 		self.assertEqual(data['message'], 'User registered successfully')
 
 	def test_register_user_missing_fields(self):
 		data = {
-			'username': 'testuser',
+			'username': 'testUserMissingFields',
 			'password': 'password123'
 		}
 
@@ -47,16 +47,16 @@ class TestRemoteAuthenticationEndpoints(unittest.TestCase):
 
 	def test_login_user(self):
 		data = {
-			'username': 'testuser',
-			'email': 'testuser@example.com',
-			'password': 'password123'
+			'username': "TestLoginUser",
+			'email': "testuser@example.com",
+			'password': "password123"
 		}
 
 		# Register the user first
 		response = requests.post(f"{self.base_url}/register", json=data)
 
 		# Now attempt to login
-		response = requests.post(f"{self.base_url}/login", json={'username': 'testuser', 'password': 'password123'})
+		response = requests.post(f"{self.base_url}/login", json=data)
 		data = response.get_json()
 
 		self.assertEqual(response.status_code, 200)
@@ -73,7 +73,7 @@ class TestRemoteAuthenticationEndpoints(unittest.TestCase):
 
 	def test_register_user_already_registered(self):
 		data = {
-			'username': 'testuser',
+			'username': 'testUserAlreadyRegistered',
 			'email': 'testemail',
 			'password': 'password123'
 		}
