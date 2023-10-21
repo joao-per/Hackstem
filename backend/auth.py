@@ -75,3 +75,15 @@ def login():
 		return jsonify({'error': 'Missing required fields'}), 400
 
 	return login_user(username, password)
+
+@auth_bp.route('/truncate-tables', methods=['POST'])
+def truncate_tables():
+  with current_app.app_context():
+        conn = sqlite3.connect(current_app.config['DATABASE'])
+        cursor = conn.cursor()
+    
+        cursor.execute('DELETE FROM user')
+        conn.commit()
+        conn.close()
+        #current_app.db.session.rollback()
+        return {'message': 'Tables truncated successfully'}
