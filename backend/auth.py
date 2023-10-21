@@ -69,7 +69,6 @@ def login():
 	data = request.json
 	username = data.get('username')
 	password = data.get('password')
-
 	print(username, password)
 	if not username or not password:
 		return jsonify({'error': 'Missing required fields'}), 400
@@ -85,5 +84,4 @@ def truncate_tables():
         cursor.execute('DELETE FROM user')
         conn.commit()
         conn.close()
-        #current_app.db.session.rollback()
         return {'message': 'Tables truncated successfully'}

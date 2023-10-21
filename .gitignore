@@ -2,3 +2,7 @@
 __pycache__/
 migrations/
 *.db
+.pythonlibs/
+.replit
+poetry.lock
+pyproject.toml
